@@ -43,6 +43,7 @@ function gi_prefetch_post_data($post_ids) {
  * 統計情報をキャッシュ付きで取得
  * 重いクエリをトランジェントでキャッシュ
  */
+if (!function_exists('gi_get_cached_stats')) {
 function gi_get_cached_stats() {
     $cache_key = 'gi_site_stats_v2';
     $cached_stats = get_transient($cache_key);
@@ -92,6 +93,7 @@ function gi_get_cached_stats() {
     set_transient($cache_key, $stats, DAY_IN_SECONDS);
     
     return $stats;
+}
 }
 
 /**

@@ -1056,7 +1056,12 @@
                 <!-- Stats Display -->
                 <div class="gi-stats">
                     <?php
-                    $stats = gi_get_cached_stats();
+                    $stats = function_exists('gi_get_cached_stats') ? gi_get_cached_stats() : array(
+                        'total_grants' => 0,
+                        'active_grants' => 0,
+                        'prefecture_count' => 47,
+                        'avg_success_rate' => 70
+                    );
                     if ($stats && !empty($stats['total_grants'])) {
                         echo '<div class="gi-stat-item">';
                         echo '<div class="gi-stat-icon"></div>';
