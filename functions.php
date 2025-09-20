@@ -35,7 +35,10 @@ $required_files = array(
     '11-grant-card-renderer.php',     // 助成金カードレンダラー
     '12-ai_concierge_function.php',   // AIコンシェルジュ機能
     '13-ai-enhanced-functions.php',   // AI強化機能（セマンティック検索、ストリーミング、音声認識）
-    '14-vector-database.php'          // ベクトルデータベース（セマンティック検索用）
+    '14-vector-database.php',         // ベクトルデータベース（セマンティック検索用）
+    '15-openai-integration.php',      // OpenAI API統合（完全実装版）
+    '16-grant-semantic-search.php',   // 助成金セマンティック検索（強化版）
+    '17-emotion-learning-system.php'  // 感情分析＆学習システム（日本語対応）
 );
 
 // 各ファイルを安全に読み込み
@@ -116,6 +119,36 @@ function gi_theme_cleanup() {
     }
 }
 add_action('switch_theme', 'gi_theme_cleanup');
+
+/**
+ * AI強化機能のスクリプトとスタイル登録
+ */
+function gi_enqueue_ai_enhanced_assets() {
+    // 強化版AIアシスタントJS
+    wp_enqueue_script(
+        'gi-ai-assistant-enhanced',
+        get_template_directory_uri() . '/js/ai-assistant-enhanced.js',
+        array('jquery'),
+        GI_THEME_VERSION,
+        true
+    );
+    
+    // 強化版AIアシスタントCSS
+    wp_enqueue_style(
+        'gi-ai-assistant-enhanced',
+        get_template_directory_uri() . '/css/ai-assistant-enhanced.css',
+        array(),
+        GI_THEME_VERSION
+    );
+    
+    // Ajax設定をローカライズ
+    wp_localize_script('gi-ai-assistant-enhanced', 'gi_ajax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('gi_ai_nonce'),
+        'api_key_configured' => !empty(get_option('gi_ai_concierge_settings')['openai_api_key'])
+    ));
+}
+add_action('wp_enqueue_scripts', 'gi_enqueue_ai_enhanced_assets', 100);
 
 /**
  * スクリプトにdefer属性を追加（改善版）
