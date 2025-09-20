@@ -403,9 +403,9 @@ class GI_OpenAI_Integration {
 }
 
 /**
- * ストリーミングレスポンスハンドラー
+ * ストリーミングレスポンスハンドラー（強化版）
  */
-class GI_Streaming_Handler {
+class GI_Enhanced_Streaming_Handler {
     
     /**
      * SSEレスポンス送信
@@ -481,7 +481,7 @@ function gi_handle_streaming_chat() {
     $openai = GI_OpenAI_Integration::getInstance();
     
     // ストリーミング開始
-    GI_Streaming_Handler::start_streaming();
+    GI_Enhanced_Streaming_Handler::start_streaming();
     
     // システムプロンプト構築
     $system_prompt = $openai->build_system_prompt($context);
@@ -502,7 +502,7 @@ function gi_handle_streaming_chat() {
     $buffer = '';
     $callback = function($chunk) use (&$buffer) {
         $buffer .= $chunk;
-        GI_Streaming_Handler::send_sse_response([
+        GI_Enhanced_Streaming_Handler::send_sse_response([
             'type' => 'chunk',
             'content' => $chunk
         ]);
@@ -516,14 +516,14 @@ function gi_handle_streaming_chat() {
     ], $callback);
     
     if (is_wp_error($result)) {
-        GI_Streaming_Handler::send_sse_response([
+        GI_Enhanced_Streaming_Handler::send_sse_response([
             'type' => 'error',
             'message' => $result->get_error_message()
         ]);
     }
     
     // 完了通知
-    GI_Streaming_Handler::end_streaming();
+    GI_Enhanced_Streaming_Handler::end_streaming();
     
     // 会話履歴を保存
     gi_save_conversation($session_id, $message, $buffer);

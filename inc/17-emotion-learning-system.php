@@ -443,9 +443,9 @@ class GI_Japanese_Emotion_Analyzer {
 }
 
 /**
- * 学習システム
+ * 学習システム（完全実装版）
  */
-class GI_Learning_System {
+class GI_Advanced_Learning_System {
     
     private static $instance = null;
     private $table_name;
@@ -721,5 +721,5 @@ class GI_Learning_System {
 // インスタンス初期化
 add_action('init', function() {
     GI_Japanese_Emotion_Analyzer::getInstance();
-    GI_Learning_System::getInstance();
+    GI_Advanced_Learning_System::getInstance();
 });
