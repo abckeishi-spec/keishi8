@@ -19,9 +19,11 @@ the_post();
 $post_id = get_the_ID();
 
 // Enhanced meta data retrieval with fallbacks
-function gi_safe_get_meta($post_id, $key, $default = '') {
-    $value = get_post_meta($post_id, $key, true);
-    return !empty($value) ? $value : $default;
+if (!function_exists('gi_safe_get_meta')) {
+    function gi_safe_get_meta($post_id, $key, $default = '') {
+        $value = get_post_meta($post_id, $key, true);
+        return !empty($value) ? $value : $default;
+    }
 }
 
 // Core grant data
