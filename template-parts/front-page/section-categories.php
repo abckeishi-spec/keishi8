@@ -257,12 +257,18 @@ if (function_exists('gi_get_cached_stats')) {
         </div>
         <?php endif; ?>
 
-        <!-- SVG日本地図セクション -->
+        <!-- Japan Map JS Advanced セクション -->
         <?php 
-        // SVG日本地図コンポーネントを読み込み
-        $svg_map_path = get_template_directory() . '/template-parts/front-page/japan-map-svg.php';
-        if (file_exists($svg_map_path)) {
-            include $svg_map_path;
+        // Japan Map JSプラグインを使用した高度な地図コンポーネント
+        $advanced_map_path = get_template_directory() . '/template-parts/front-page/japan-map-advanced.php';
+        if (file_exists($advanced_map_path)) {
+            include $advanced_map_path;
+        } else {
+            // フォールバック：SVG地図
+            $svg_map_path = get_template_directory() . '/template-parts/front-page/japan-map-svg.php';
+            if (file_exists($svg_map_path)) {
+                include $svg_map_path;
+            }
         }
         ?>
         
