@@ -47,8 +47,55 @@ class GI_Grant_Semantic_Search {
         // 助成金投稿が保存されたときにエンベディングを生成
         add_action('save_post_grant', [$this, 'update_grant_embedding'], 10, 3);
         
-        // 検索クエリフィルタ
-        add_filter('pre_get_posts', [$this, 'enhance_grant_search']);
+        // 検索クエリフィルタは一旦無効化（カスタマイザーとの競合を避けるため）
+        // 必要に応じて有効化してください
+        // add_filter('pre_get_posts', [$this, 'enhance_grant_search']);
+    }
+    
+    /**
+     * 検索クエリの強化
+     */
+    public function enhance_grant_search($query) {
+        // 管理画面では処理しない
+        if (is_admin()) {
+            return $query;
+        }
+        
+        // メインクエリでない場合は処理しない
+        if (!$query->is_main_query()) {
+            return $query;
+        }
+        
+        // 検索クエリでない場合は処理しない
+        if (!$query->is_search()) {
+            return $query;
+        }
+        
+        // 助成金の検索の場合のみ処理
+        if ($query->get('post_type') !== 'grant' && !in_array('grant', (array)$query->get('post_type'))) {
+            return $query;
+        }
+        
+        // 検索語を取得
+        $search_term = $query->get('s');
+        if (empty($search_term)) {
+            return $query;
+        }
+        
+        // セマンティック検索を実行して、関連する投稿IDを取得
+        $results = $this->search_grants($search_term);
+        
+        if (!empty($results)) {
+            // 検索結果のIDを抽出
+            $post_ids = wp_list_pluck($results, 'id');
+            
+            // クエリを修正
+            $query->set('post__in', $post_ids);
+            $query->set('orderby', 'post__in');
+            $query->set('s', ''); // 標準検索を無効化
+        }
+        
+        return $query;
     }
     
     /**
