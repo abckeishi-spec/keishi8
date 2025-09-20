@@ -26,11 +26,11 @@ $required_functions = [
     'gi_get_grant_amount_display'
 ];
 
-// URLパラメータから検索条件を取得
+// URLパラメータから検索条件を取得（両方のパラメータ名に対応）
 $search_params = [
     'search' => sanitize_text_field($_GET['s'] ?? ''),
-    'category' => sanitize_text_field($_GET['category'] ?? ''),
-    'prefecture' => sanitize_text_field($_GET['prefecture'] ?? ''),
+    'category' => sanitize_text_field($_GET['category'] ?? $_GET['grant_category'] ?? ''),
+    'prefecture' => sanitize_text_field($_GET['prefecture'] ?? $_GET['grant_prefecture'] ?? ''),
     'amount' => sanitize_text_field($_GET['amount'] ?? ''),
     'status' => sanitize_text_field($_GET['status'] ?? ''),
     'difficulty' => sanitize_text_field($_GET['difficulty'] ?? ''),

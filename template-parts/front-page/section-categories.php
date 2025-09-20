@@ -197,12 +197,12 @@ if (function_exists('gi_get_cached_stats')) {
                             <?php foreach ($recent_grants as $grant): 
                                 $amount = gi_safe_get_meta($grant->ID, 'max_amount', '');
                             ?>
-                            <div class="recent-grant-item">
+                            <a href="<?php echo esc_url(get_permalink($grant->ID)); ?>" class="recent-grant-item" target="_blank">
                                 <span class="grant-title"><?php echo esc_html(mb_substr($grant->post_title, 0, 20)); ?>...</span>
                                 <?php if ($amount): ?>
                                 <span class="grant-amount"><?php echo esc_html($amount); ?></span>
                                 <?php endif; ?>
-                            </div>
+                            </a>
                             <?php endforeach; ?>
                         </div>
                         <?php endif; ?>
@@ -662,6 +662,16 @@ if (function_exists('gi_get_cached_stats')) {
     align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid #e0e0e0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+a.recent-grant-item:hover {
+    background: rgba(0, 0, 0, 0.02);
+    padding-left: 8px;
+    margin-left: -8px;
+    padding-right: 8px;
+    margin-right: -8px;
 }
 
 .recent-grant-item:last-child {
@@ -902,8 +912,15 @@ if (function_exists('gi_get_cached_stats')) {
     cursor: pointer;
 }
 
-.region-block:hover circle {
+.region-block:hover circle,
+.region-block.active circle,
+.region-block.hover circle {
     fill: #000000;
+}
+
+.region-block.active circle {
+    stroke-width: 3;
+    stroke: #4CAF50;
 }
 
 .region-block text {
@@ -914,8 +931,17 @@ if (function_exists('gi_get_cached_stats')) {
     transition: fill 0.3s ease;
 }
 
-.region-block:hover text {
+.region-block:hover text,
+.region-block.active text,
+.region-block.hover text {
     fill: #ffffff;
+}
+
+/* 都道府県アイテムのハイライト状態 */
+.prefecture-item.highlighted {
+    background: #E8F5E9 !important;
+    border-color: #4CAF50 !important;
+    opacity: 1 !important;
 }
 
 /* 都道府県リスト */
@@ -1238,24 +1264,75 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // 地域と都道府県のマッピング
+    const regionPrefectureMap = {
+        'hokkaido': ['北海道'],
+        'tohoku': ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'],
+        'kanto': ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'],
+        'chubu': ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'],
+        'kinki': ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'],
+        'chugoku': ['鳥取県', '島根県', '岡山県', '広島県', '山口県'],
+        'shikoku': ['徳島県', '香川県', '愛媛県', '高知県'],
+        'kyushu': ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県']
+    };
+    
     // 地域ブロッククリック
     document.querySelectorAll('.region-block').forEach(block => {
         block.addEventListener('click', function() {
             const region = this.getAttribute('data-region');
-            console.log('Selected region:', region);
+            const prefectures = regionPrefectureMap[region] || [];
             
-            // ここに地域選択時の処理を追加
-            // 例：該当する都道府県をハイライト
-            document.querySelectorAll('.prefecture-item').forEach(item => {
-                item.style.opacity = '0.3';
+            // 全ての地域ブロックの選択状態をリセット
+            document.querySelectorAll('.region-block').forEach(b => {
+                b.classList.remove('active');
             });
             
-            // 実際の実装では、地域と都道府県のマッピングが必要
-            setTimeout(() => {
-                document.querySelectorAll('.prefecture-item').forEach(item => {
+            // クリックされた地域をアクティブに
+            this.classList.add('active');
+            
+            // 該当する都道府県をハイライト
+            document.querySelectorAll('.prefecture-item').forEach(item => {
+                const prefName = item.querySelector('.prefecture-name').textContent;
+                if (prefectures.includes(prefName)) {
+                    item.classList.add('highlighted');
                     item.style.opacity = '1';
-                });
-            }, 2000);
+                    item.style.background = '#f0f0f0';
+                } else {
+                    item.classList.remove('highlighted');
+                    item.style.opacity = '0.3';
+                    item.style.background = '';
+                }
+            });
+            
+            // 都道府県リストをスクロール
+            const prefectureList = document.querySelector('.prefecture-list');
+            if (prefectureList) {
+                prefectureList.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    });
+    
+    // 都道府県アイテムクリック時に地域も連動
+    document.querySelectorAll('.prefecture-item').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            const prefName = this.querySelector('.prefecture-name').textContent;
+            
+            // 該当する地域を探す
+            for (const [region, prefs] of Object.entries(regionPrefectureMap)) {
+                if (prefs.includes(prefName)) {
+                    const regionBlock = document.querySelector(`.region-block[data-region="${region}"]`);
+                    if (regionBlock) {
+                        regionBlock.classList.add('hover');
+                    }
+                    break;
+                }
+            }
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.region-block').forEach(block => {
+                block.classList.remove('hover');
+            });
         });
     });
     

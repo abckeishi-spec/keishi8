@@ -46,13 +46,17 @@ class AIAssistantEnhanced {
      * 初期化
      */
     init() {
-        this.createChatInterface();
-        this.bindEvents();
-        this.initVoiceRecognition();
-        this.loadConversationHistory();
-        this.startHeartbeat();
-        this.initKeyboardShortcuts();
-        this.setupAutoSuggestions();
+        // フローティングボタンを作成しない（ユーザーリクエストにより削除）
+        // this.createChatInterface();
+        // this.bindEvents();
+        // this.initVoiceRecognition();
+        // this.loadConversationHistory();
+        // this.startHeartbeat();
+        // this.initKeyboardShortcuts();
+        // this.setupAutoSuggestions();
+        
+        // AIアシスタント機能は検索セクションから直接呼び出される
+        console.log('AI Assistant Enhanced - フローティングボタン無効化');
     }
     
     /**

@@ -91,6 +91,152 @@
 }
 
 /* ==================== 
+   助成金結果表示
+   ==================== */
+.ai-grant-results {
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+}
+
+.ai-grant-results h4 {
+    margin: 0 0 15px;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.grant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.grant-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.grant-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.grant-number {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.grant-info {
+    flex: 1;
+}
+
+.grant-info h5 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.grant-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.grant-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.grant-excerpt {
+    margin: 8px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.grant-meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.meta-badge {
+    padding: 4px 8px;
+    background: var(--bg-tertiary);
+    border-radius: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.meta-badge.urgent {
+    background: #FFEBEE;
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.meta-badge.category {
+    background: #E3F2FD;
+    color: var(--secondary-color);
+}
+
+.meta-badge.location {
+    background: #F3E5F5;
+    color: #9C27B0;
+}
+
+.grant-action {
+    margin-top: 10px;
+}
+
+.view-detail-link {
+    display: inline-block;
+    padding: 6px 12px;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+.view-detail-link:hover {
+    background: var(--secondary-color);
+}
+
+.ai-info-note {
+    margin-top: 15px;
+    padding: 12px;
+    background: #FFF9C4;
+    border-radius: 6px;
+    border-left: 3px solid var(--warning-color);
+}
+
+.ai-info-note p {
+    margin: 0;
+    font-size: 13px;
+    color: #6D4C41;
+}
+
+/* ==================== 
    チャットウィンドウ
    ==================== */
 .ai-chat-window {

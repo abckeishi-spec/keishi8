@@ -269,8 +269,14 @@ class GI_AI_Concierge {
             // 学習システムへのフィードバック
             $this->learning_system->record_interaction($user_message, $ai_response['content'], $intent);
             
-            // 関連助成金の提案
+            // 関連助成金の提案（改良版）
             $related_grants = $this->get_related_grants($user_message, $intent, $context);
+            
+            // キーワードマッチした助成金がある場合、応答に追加
+            if (!empty($related_grants)) {
+                $grant_html = $this->format_grant_results_for_response($related_grants, $user_message);
+                $ai_response['content'] .= $grant_html;
+            }
             
             // 追加提案の生成
             $suggestions = $this->generate_suggestions($intent, $context, $conversation_history);
@@ -734,20 +740,66 @@ class GI_AI_Concierge {
      * 関連助成金の取得
      */
     private function get_related_grants($message, $intent, $context) {
-        // メッセージから業種や地域情報を抽出
+        // キーワード抽出（より詳細に）
+        $keywords = $this->extract_keywords_from_message($message);
         $extracted_info = $this->extract_business_info($message);
         
         // 検索クエリの構築
         $search_args = [
             'post_type' => 'grant',
             'post_status' => 'publish',
-            'posts_per_page' => 5,
-            'meta_query' => []
+            'posts_per_page' => 10, // より多くの候補から選択
+            'meta_query' => [],
+            'tax_query' => []
         ];
+        
+        // キーワード検索（タイトル、内容、カスタムフィールド）
+        if (!empty($keywords)) {
+            $search_args['s'] = implode(' ', $keywords);
+            
+            // メタクエリでも検索
+            $meta_queries = [];
+            foreach ($keywords as $keyword) {
+                $meta_queries[] = [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'grant_purpose',
+                        'value' => $keyword,
+                        'compare' => 'LIKE'
+                    ],
+                    [
+                        'key' => 'grant_target',
+                        'value' => $keyword,
+                        'compare' => 'LIKE'
+                    ],
+                    [
+                        'key' => 'grant_description',
+                        'value' => $keyword,
+                        'compare' => 'LIKE'
+                    ]
+                ];
+            }
+            
+            if (!empty($meta_queries)) {
+                $search_args['meta_query'] = array_merge(
+                    ['relation' => 'OR'],
+                    $meta_queries
+                );
+            }
+        }
+        
+        // カテゴリーフィルター
+        if (!empty($extracted_info['category'])) {
+            $search_args['tax_query'][] = [
+                'taxonomy' => 'grant_category',
+                'field' => 'slug',
+                'terms' => $extracted_info['category']
+            ];
+        }
         
         // 業種フィルター
         if (!empty($extracted_info['business_type'])) {
-            $search_args['meta_query'][] = [
+            $meta_queries[] = [
                 'key' => 'grant_target',
                 'value' => $extracted_info['business_type'],
                 'compare' => 'LIKE'
@@ -756,25 +808,68 @@ class GI_AI_Concierge {
         
         // 地域フィルター
         if (!empty($extracted_info['location'])) {
-            $search_args['tax_query'] = [[
+            $search_args['tax_query'][] = [
                 'taxonomy' => 'grant_prefecture',
-                'field' => 'slug',
-                'terms' => sanitize_title($extracted_info['location'])
-            ]];
+                'field' => 'name',
+                'terms' => $extracted_info['location']
+            ];
+        }
+        
+        // 税クエリの関係設定
+        if (count($search_args['tax_query']) > 1) {
+            $search_args['tax_query']['relation'] = 'AND';
         }
         
         $grants = get_posts($search_args);
         
-        $result = [];
+        // スコアリング（関連性の高い順に並べ替え）
+        $scored_grants = [];
         foreach ($grants as $grant) {
+            $score = $this->calculate_grant_relevance_score($grant, $keywords, $extracted_info);
+            $scored_grants[] = [
+                'grant' => $grant,
+                'score' => $score
+            ];
+        }
+        
+        // スコア順にソート
+        usort($scored_grants, function($a, $b) {
+            return $b['score'] - $a['score'];
+        });
+        
+        // 上位5件を返す
+        $result = [];
+        foreach (array_slice($scored_grants, 0, 5) as $item) {
+            $grant = $item['grant'];
+            $deadline = get_post_meta($grant->ID, 'deadline', true);
+            $amount = get_post_meta($grant->ID, 'max_amount', true);
+            
+            // 締切日のフォーマット
+            $deadline_text = '';
+            if ($deadline) {
+                $deadline_date = strtotime($deadline);
+                if ($deadline_date) {
+                    $days_left = ceil(($deadline_date - time()) / (60 * 60 * 24));
+                    if ($days_left > 0) {
+                        $deadline_text = $days_left . '日後';
+                    } else {
+                        $deadline_text = '終了';
+                    }
+                }
+            }
+            
             $result[] = [
                 'id' => $grant->ID,
                 'title' => $grant->post_title,
-                'permalink' => get_permalink($grant->ID),
-                'excerpt' => get_the_excerpt($grant->ID),
-                'amount' => get_post_meta($grant->ID, 'max_amount', true),
-                'deadline' => get_post_meta($grant->ID, 'deadline', true),
-                'organization' => get_post_meta($grant->ID, 'organization', true)
+                'url' => get_permalink($grant->ID),
+                'excerpt' => wp_trim_words(get_the_excerpt($grant->ID), 30, '...'),
+                'amount' => $amount ? '最大' . number_format((int)$amount) . '円' : '金額情報なし',
+                'deadline' => $deadline,
+                'deadline_text' => $deadline_text,
+                'organization' => get_post_meta($grant->ID, 'organization', true),
+                'score' => $item['score'],
+                'categories' => wp_get_post_terms($grant->ID, 'grant_category', ['fields' => 'names']),
+                'prefectures' => wp_get_post_terms($grant->ID, 'grant_prefecture', ['fields' => 'names'])
             ];
         }
         
@@ -782,30 +877,140 @@ class GI_AI_Concierge {
     }
     
     /**
-     * ビジネス情報の抽出
+     * キーワード抽出（改良版）
+     */
+    private function extract_keywords_from_message($message) {
+        // 重要なキーワードパターン
+        $important_keywords = [
+            '雇用' => ['雇用', '採用', '人材', '従業員', '雇い入れ', 'キャリアアップ'],
+            'IT' => ['IT', 'DX', 'デジタル', 'システム', 'ソフトウェア', 'EC', 'ウェブ'],
+            '設備' => ['設備', '機械', '装置', '導入', '更新'],
+            '創業' => ['創業', '起業', 'スタートアップ', '開業', '新規事業'],
+            '販促' => ['販促', '販売促進', 'マーケティング', '広告', 'PR'],
+            '研究開発' => ['研究', '開発', 'R&D', '技術開発', 'イノベーション'],
+            '省エネ' => ['省エネ', '環境', 'SDGs', 'カーボンニュートラル', 'エコ'],
+            '事業承継' => ['事業承継', '後継者', 'M&A', '継承'],
+            '働き方' => ['働き方改革', 'テレワーク', 'リモートワーク', '在宅勤務'],
+            '生産性' => ['生産性', '効率化', '改善', '合理化']
+        ];
+        
+        $keywords = [];
+        foreach ($important_keywords as $category => $terms) {
+            foreach ($terms as $term) {
+                if (mb_stripos($message, $term) !== false) {
+                    $keywords[] = $term;
+                }
+            }
+        }
+        
+        return array_unique($keywords);
+    }
+    
+    /**
+     * 助成金の関連性スコア計算
+     */
+    private function calculate_grant_relevance_score($grant, $keywords, $extracted_info) {
+        $score = 0;
+        
+        // タイトルマッチ（最重要）
+        foreach ($keywords as $keyword) {
+            if (mb_stripos($grant->post_title, $keyword) !== false) {
+                $score += 10;
+            }
+        }
+        
+        // 内容マッチ
+        $content = $grant->post_content . ' ' . $grant->post_excerpt;
+        foreach ($keywords as $keyword) {
+            if (mb_stripos($content, $keyword) !== false) {
+                $score += 5;
+            }
+        }
+        
+        // カスタムフィールドマッチ
+        $custom_fields = [
+            'grant_purpose' => 3,
+            'grant_target' => 3,
+            'grant_description' => 2
+        ];
+        
+        foreach ($custom_fields as $field => $weight) {
+            $value = get_post_meta($grant->ID, $field, true);
+            foreach ($keywords as $keyword) {
+                if (mb_stripos($value, $keyword) !== false) {
+                    $score += $weight;
+                }
+            }
+        }
+        
+        // 締切日の近さ（緊急度）
+        $deadline = get_post_meta($grant->ID, 'deadline', true);
+        if ($deadline) {
+            $days_left = ceil((strtotime($deadline) - time()) / (60 * 60 * 24));
+            if ($days_left > 0 && $days_left <= 30) {
+                $score += (31 - $days_left) / 3; // 締切が近いほど高スコア
+            }
+        }
+        
+        return $score;
+    }
+    
+    /**
+     * ビジネス情報の抽出（改良版）
      */
     private function extract_business_info($message) {
         $business_types = [
-            '製造業' => ['製造', 'メーカー', '工場', '生産'],
-            '小売業' => ['小売', '販売', '店舗', 'ショップ'],
-            'IT業' => ['IT', 'システム', 'ソフトウェア', 'アプリ', 'Web'],
-            '建設業' => ['建設', '工事', '建築', 'リフォーム'],
-            'サービス業' => ['サービス', 'コンサルティング', '相談'],
-            '飲食業' => ['飲食', 'レストラン', 'カフェ', '居酒屋']
+            '製造業' => ['製造', 'メーカー', '工場', '生産', 'ものづくり'],
+            '小売業' => ['小売', '販売', '店舗', 'ショップ', '物販'],
+            'IT業' => ['IT', 'システム', 'ソフトウェア', 'アプリ', 'Web', 'プログラム'],
+            '建設業' => ['建設', '工事', '建築', 'リフォーム', '土木'],
+            'サービス業' => ['サービス', 'コンサルティング', '相談', '支援'],
+            '飲食業' => ['飲食', 'レストラン', 'カフェ', '居酒屋', '食堂'],
+            '医療・福祉' => ['医療', '介護', '福祉', '病院', 'クリニック'],
+            '運輸業' => ['運輸', '物流', '配送', 'トラック', '運送'],
+            '不動産業' => ['不動産', '賃貸', '管理', '仲介'],
+            '教育' => ['教育', '学習', '塾', 'スクール', '研修']
         ];
         
+        // カテゴリー抽出
+        $categories = [
+            'it-digital' => ['IT', 'DX', 'デジタル', 'システム'],
+            'manufacturing' => ['ものづくり', '製造', '生産'],
+            'startup' => ['創業', '起業', 'スタートアップ'],
+            'employment' => ['雇用', '採用', '人材'],
+            'environment' => ['環境', '省エネ', 'SDGs'],
+            'small-business' => ['小規模', '個人事業']
+        ];
+        
+        // 全都道府県リスト
         $prefectures = [
-            '東京都', '大阪府', '愛知県', '神奈川県', '埼玉県', '千葉県',
-            '兵庫県', '北海道', '福岡県', '静岡県', '茨城県', '広島県'
+            '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+            '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
+            '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県',
+            '岐阜県', '静岡県', '愛知県', '三重県',
+            '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+            '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+            '徳島県', '香川県', '愛媛県', '高知県',
+            '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'
         ];
         
-        $extracted = ['business_type' => '', 'location' => ''];
+        $extracted = ['business_type' => '', 'location' => '', 'category' => ''];
         
         // 業種抽出
         foreach ($business_types as $type => $keywords) {
             foreach ($keywords as $keyword) {
-                if (strpos($message, $keyword) !== false) {
+                if (mb_stripos($message, $keyword) !== false) {
                     $extracted['business_type'] = $type;
+                    break 2;
+                }
+            }
+        }
+        
+        // カテゴリー抽出
+        foreach ($categories as $slug => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (mb_stripos($message, $keyword) !== false) {
+                    $extracted['category'] = $slug;
                     break 2;
                 }
             }
@@ -813,13 +1018,75 @@ class GI_AI_Concierge {
         
         // 地域抽出
         foreach ($prefectures as $prefecture) {
-            if (strpos($message, $prefecture) !== false) {
+            if (mb_stripos($message, $prefecture) !== false) {
                 $extracted['location'] = $prefecture;
                 break;
             }
         }
         
         return $extracted;
+    }
+    
+    /**
+     * 助成金結果のHTML形式フォーマット
+     */
+    private function format_grant_results_for_response($grants, $query) {
+        if (empty($grants)) return '';
+        
+        $html = '<div class="ai-grant-results">';
+        $html .= '<h4>🎯 あなたの質問にマッチする助成金</h4>';
+        $html .= '<div class="grant-list">';
+        
+        foreach ($grants as $index => $grant) {
+            $num = $index + 1;
+            $html .= '<div class="grant-item">';
+            $html .= '<div class="grant-number">' . $num . '</div>';
+            $html .= '<div class="grant-info">';
+            $html .= '<h5><a href="' . esc_url($grant['url']) . '" target="_blank" class="grant-link">';
+            $html .= esc_html($grant['title']) . '</a></h5>';
+            
+            // 説明
+            $html .= '<p class="grant-excerpt">' . esc_html($grant['excerpt']) . '</p>';
+            
+            // メタ情報
+            $html .= '<div class="grant-meta-info">';
+            if (!empty($grant['amount'])) {
+                $html .= '<span class="meta-badge">💰 ' . esc_html($grant['amount']) . '</span>';
+            }
+            if (!empty($grant['deadline_text']) && $grant['deadline_text'] !== '終了') {
+                $urgency = (strtotime($grant['deadline']) - time()) < (30 * 24 * 60 * 60) ? 'urgent' : '';
+                $html .= '<span class="meta-badge ' . $urgency . '">📅 締切まで' . esc_html($grant['deadline_text']) . '</span>';
+            }
+            if (!empty($grant['categories'])) {
+                foreach ($grant['categories'] as $cat) {
+                    $html .= '<span class="meta-badge category">🏷️ ' . esc_html($cat) . '</span>';
+                }
+            }
+            if (!empty($grant['prefectures'])) {
+                foreach ($grant['prefectures'] as $pref) {
+                    $html .= '<span class="meta-badge location">📍 ' . esc_html($pref) . '</span>';
+                }
+            }
+            $html .= '</div>';
+            
+            // 詳細リンク
+            $html .= '<div class="grant-action">';
+            $html .= '<a href="' . esc_url($grant['url']) . '" target="_blank" class="view-detail-link">詳細を見る →</a>';
+            $html .= '</div>';
+            
+            $html .= '</div></div>';
+        }
+        
+        $html .= '</div>';
+        
+        // 追加情報
+        $html .= '<div class="ai-info-note">';
+        $html .= '<p>💡 <strong>ヒント：</strong>各助成金の詳細ページで、申請条件や必要書類をご確認ください。</p>';
+        $html .= '</div>';
+        
+        $html .= '</div>';
+        
+        return $html;
     }
     
     /**
