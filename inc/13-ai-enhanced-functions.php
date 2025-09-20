@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
  * =============================================================================
  */
 
-class GI_Enhanced_Semantic_Search {
+class GI_Advanced_Semantic_Search {
     
     private static $instance = null;
     private $embeddings_cache = [];
@@ -372,7 +372,7 @@ class GI_Enhanced_Semantic_Search {
  * =============================================================================
  */
 
-class GI_Enhanced_Emotion_Analyzer {
+class GI_Advanced_Emotion_Analyzer {
     
     private static $instance = null;
     private $emotion_lexicon = [];
@@ -819,7 +819,7 @@ class GI_Voice_Recognition {
  * =============================================================================
  */
 
-class GI_Learning_System {
+class GI_Enhanced_Learning_System {
     
     private static $instance = null;
     private $feedback_threshold = 0.7;
@@ -1075,11 +1075,11 @@ function handle_enhanced_semantic_search() {
     $query = sanitize_text_field($_POST['query'] ?? '');
     $context = $_POST['context'] ?? [];
     
-    $search_engine = GI_Enhanced_Semantic_Search::getInstance();
+    $search_engine = GI_Advanced_Semantic_Search::getInstance();
     $results = $search_engine->semantic_search($query, $context);
     
     // 学習システムに記録
-    $learning = GI_Learning_System::getInstance();
+    $learning = GI_Enhanced_Learning_System::getInstance();
     $learning->record_interaction($query, $results, $context);
     
     wp_send_json_success($results);
@@ -1095,7 +1095,7 @@ function handle_emotion_analysis() {
     $message = sanitize_textarea_field($_POST['message'] ?? '');
     $context = $_POST['context'] ?? [];
     
-    $analyzer = GI_Enhanced_Emotion_Analyzer::getInstance();
+    $analyzer = GI_Advanced_Emotion_Analyzer::getInstance();
     $analysis = $analyzer->analyze_emotion($message, $context);
     
     wp_send_json_success($analysis);
@@ -1153,7 +1153,7 @@ function handle_learning_feedback() {
     $interaction_id = intval($_POST['interaction_id'] ?? 0);
     $feedback = floatval($_POST['feedback'] ?? 0);
     
-    $learning = GI_Learning_System::getInstance();
+    $learning = GI_Enhanced_Learning_System::getInstance();
     $learning->process_feedback($interaction_id, $feedback);
     
     wp_send_json_success(['message' => 'フィードバックを受け付けました']);
@@ -1168,7 +1168,7 @@ function handle_get_recommendations() {
     
     $context = $_POST['context'] ?? [];
     
-    $learning = GI_Learning_System::getInstance();
+    $learning = GI_Enhanced_Learning_System::getInstance();
     $recommendations = $learning->get_recommended_queries($context);
     
     wp_send_json_success($recommendations);
