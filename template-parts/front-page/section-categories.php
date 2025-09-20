@@ -257,63 +257,181 @@ if (function_exists('gi_get_cached_stats')) {
         </div>
         <?php endif; ?>
 
+        <!-- シンプル日本地図セクション -->
+        <?php 
+        // シンプルな日本地図グリッドレイアウト
+        $simple_map_path = get_template_directory() . '/template-parts/front-page/japan-map-simple.php';
+        if (file_exists($simple_map_path)) {
+            include $simple_map_path;
+        } else {
+            // フォールバック: 高度な地図
+            $advanced_map_path = get_template_directory() . '/template-parts/front-page/japan-map-advanced.php';
+            if (file_exists($advanced_map_path)) {
+                include $advanced_map_path;
+            }
+        }
+        ?>
+        
         <!-- 地域別検索 -->
         <div class="region-section" data-aos="fade-up">
             <div class="region-header">
                 <h3 class="region-title">
                     <span class="title-en">REGIONAL SEARCH</span>
-                    <span class="title-ja">地域から探す</span>
+                    <span class="title-ja">都道府県を選んでください</span>
                 </h3>
             </div>
 
             <div class="regions-container">
-                <div class="japan-map">
-                    <!-- 日本地図SVG（簡略版） -->
-                    <svg viewBox="0 0 500 600" class="map-svg">
-                        <!-- 地域ブロック -->
-                        <g class="region-blocks">
-                            <?php
-                            $regions = array(
-                                'hokkaido' => array('x' => 400, 'y' => 50, 'name' => '北海道'),
-                                'tohoku' => array('x' => 380, 'y' => 150, 'name' => '東北'),
-                                'kanto' => array('x' => 350, 'y' => 280, 'name' => '関東'),
-                                'chubu' => array('x' => 280, 'y' => 280, 'name' => '中部'),
-                                'kinki' => array('x' => 200, 'y' => 350, 'name' => '近畿'),
-                                'chugoku' => array('x' => 100, 'y' => 350, 'name' => '中国'),
-                                'shikoku' => array('x' => 150, 'y' => 420, 'name' => '四国'),
-                                'kyushu' => array('x' => 50, 'y' => 450, 'name' => '九州')
-                            );
-                            
-                            foreach ($regions as $key => $region):
-                            ?>
-                            <g class="region-block" data-region="<?php echo esc_attr($key); ?>">
-                                <circle cx="<?php echo $region['x']; ?>" cy="<?php echo $region['y']; ?>" r="30" />
-                                <text x="<?php echo $region['x']; ?>" y="<?php echo $region['y'] + 5; ?>" text-anchor="middle">
-                                    <?php echo esc_html($region['name']); ?>
-                                </text>
-                            </g>
-                            <?php endforeach; ?>
-                        </g>
-                    </svg>
-                </div>
-                
-                <div class="prefecture-list">
-                    <?php
-                    $popular_prefectures = array_slice($prefectures, 0, 15);
-                    foreach ($popular_prefectures as $index => $prefecture) :
-                        $prefecture_url = add_query_arg('grant_prefecture', $prefecture->slug, $archive_base_url);
-                    ?>
-                    <a href="<?php echo esc_url($prefecture_url); ?>" 
-                       class="prefecture-item <?php echo $index < 3 ? 'featured' : ''; ?>">
-                        <span class="prefecture-name"><?php echo esc_html($prefecture->name); ?></span>
-                        <span class="prefecture-count"><?php echo $prefecture->count; ?></span>
-                        <?php if ($index < 3): ?>
-                        <span class="featured-badge">
-                            <i class="fas fa-fire"></i>
-                        </span>
-                        <?php endif; ?>
-                    </a>
-                    <?php endforeach; ?>
+                <div class="japan-map-wrapper">
+                    <!-- 完全な47都道府県インタラクティブマップ (代替表示) -->
+                    <div class="map-header" style="display:none;">
+                        <span class="map-instruction">都道府県を選んでください</span>
+                    </div>
+                    
+                    <div class="japan-regions-grid">
+                        <?php
+                        // 47都道府県の完全なデータ（地域ごとにグループ化）
+                        $all_prefectures_by_region = array(
+                            '北海道・東北' => array(
+                                array('name' => '北海道', 'slug' => 'hokkaido', 'region' => 'hokkaido'),
+                                array('name' => '青森', 'slug' => 'aomori', 'region' => 'tohoku'),
+                                array('name' => '岩手', 'slug' => 'iwate', 'region' => 'tohoku'),
+                                array('name' => '宮城', 'slug' => 'miyagi', 'region' => 'tohoku'),
+                                array('name' => '秋田', 'slug' => 'akita', 'region' => 'tohoku'),
+                                array('name' => '山形', 'slug' => 'yamagata', 'region' => 'tohoku'),
+                                array('name' => '福島', 'slug' => 'fukushima', 'region' => 'tohoku')
+                            ),
+                            '関東' => array(
+                                array('name' => '茨城', 'slug' => 'ibaraki', 'region' => 'kanto'),
+                                array('name' => '栃木', 'slug' => 'tochigi', 'region' => 'kanto'),
+                                array('name' => '群馬', 'slug' => 'gunma', 'region' => 'kanto'),
+                                array('name' => '埼玉', 'slug' => 'saitama', 'region' => 'kanto'),
+                                array('name' => '千葉', 'slug' => 'chiba', 'region' => 'kanto'),
+                                array('name' => '東京', 'slug' => 'tokyo', 'region' => 'kanto'),
+                                array('name' => '神奈川', 'slug' => 'kanagawa', 'region' => 'kanto')
+                            ),
+                            '中部' => array(
+                                array('name' => '新潟', 'slug' => 'niigata', 'region' => 'chubu'),
+                                array('name' => '富山', 'slug' => 'toyama', 'region' => 'chubu'),
+                                array('name' => '石川', 'slug' => 'ishikawa', 'region' => 'chubu'),
+                                array('name' => '福井', 'slug' => 'fukui', 'region' => 'chubu'),
+                                array('name' => '山梨', 'slug' => 'yamanashi', 'region' => 'chubu'),
+                                array('name' => '長野', 'slug' => 'nagano', 'region' => 'chubu'),
+                                array('name' => '岐阜', 'slug' => 'gifu', 'region' => 'chubu'),
+                                array('name' => '静岡', 'slug' => 'shizuoka', 'region' => 'chubu'),
+                                array('name' => '愛知', 'slug' => 'aichi', 'region' => 'chubu')
+                            ),
+                            '近畿' => array(
+                                array('name' => '三重', 'slug' => 'mie', 'region' => 'kinki'),
+                                array('name' => '滋賀', 'slug' => 'shiga', 'region' => 'kinki'),
+                                array('name' => '京都', 'slug' => 'kyoto', 'region' => 'kinki'),
+                                array('name' => '大阪', 'slug' => 'osaka', 'region' => 'kinki'),
+                                array('name' => '兵庫', 'slug' => 'hyogo', 'region' => 'kinki'),
+                                array('name' => '奈良', 'slug' => 'nara', 'region' => 'kinki'),
+                                array('name' => '和歌山', 'slug' => 'wakayama', 'region' => 'kinki')
+                            ),
+                            '中国・四国' => array(
+                                array('name' => '鳥取', 'slug' => 'tottori', 'region' => 'chugoku'),
+                                array('name' => '島根', 'slug' => 'shimane', 'region' => 'chugoku'),
+                                array('name' => '岡山', 'slug' => 'okayama', 'region' => 'chugoku'),
+                                array('name' => '広島', 'slug' => 'hiroshima', 'region' => 'chugoku'),
+                                array('name' => '山口', 'slug' => 'yamaguchi', 'region' => 'chugoku'),
+                                array('name' => '徳島', 'slug' => 'tokushima', 'region' => 'shikoku'),
+                                array('name' => '香川', 'slug' => 'kagawa', 'region' => 'shikoku'),
+                                array('name' => '愛媛', 'slug' => 'ehime', 'region' => 'shikoku'),
+                                array('name' => '高知', 'slug' => 'kochi', 'region' => 'shikoku')
+                            ),
+                            '九州・沖縄' => array(
+                                array('name' => '福岡', 'slug' => 'fukuoka', 'region' => 'kyushu'),
+                                array('name' => '佐賀', 'slug' => 'saga', 'region' => 'kyushu'),
+                                array('name' => '長崎', 'slug' => 'nagasaki', 'region' => 'kyushu'),
+                                array('name' => '熊本', 'slug' => 'kumamoto', 'region' => 'kyushu'),
+                                array('name' => '大分', 'slug' => 'oita', 'region' => 'kyushu'),
+                                array('name' => '宮崎', 'slug' => 'miyazaki', 'region' => 'kyushu'),
+                                array('name' => '鹿児島', 'slug' => 'kagoshima', 'region' => 'kyushu'),
+                                array('name' => '沖縄', 'slug' => 'okinawa', 'region' => 'kyushu')
+                            )
+                        );
+                        
+                        // 実際の助成金数を取得
+                        $prefecture_counts = array();
+                        if (!empty($prefectures)) {
+                            foreach ($prefectures as $prefecture) {
+                                $prefecture_counts[$prefecture->slug] = $prefecture->count;
+                            }
+                        }
+                        
+                        // 地域ごとに表示
+                        foreach ($all_prefectures_by_region as $region_name => $region_prefectures) :
+                        ?>
+                        <div class="region-group">
+                            <div class="region-label"><?php echo esc_html($region_name); ?></div>
+                            <div class="prefecture-grid">
+                                <?php foreach ($region_prefectures as $pref) : 
+                                    // 実際のタクソノミーからカウントを取得
+                                    $actual_count = 0;
+                                    $pref_term = null;
+                                    
+                                    // 都道府県名でマッチング
+                                    foreach ($prefectures as $prefecture) {
+                                        $clean_name = str_replace(array('県', '都', '府'), '', $prefecture->name);
+                                        if ($clean_name === $pref['name'] || 
+                                            $prefecture->name === $pref['name'] . '県' ||
+                                            $prefecture->name === $pref['name'] . '都' ||
+                                            $prefecture->name === $pref['name'] . '府' ||
+                                            $prefecture->name === $pref['name']) {
+                                            $actual_count = $prefecture->count;
+                                            $pref_term = $prefecture;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    $pref_slug = $pref_term ? $pref_term->slug : $pref['slug'];
+                                    $pref_url = add_query_arg('grant_prefecture', $pref_slug, $archive_base_url);
+                                    $has_grants = $actual_count > 0;
+                                ?>
+                                <a href="<?php echo esc_url($pref_url); ?>" 
+                                   class="prefecture-box <?php echo $has_grants ? 'has-grants' : 'no-grants'; ?>" 
+                                   data-region="<?php echo esc_attr($pref['region']); ?>"
+                                   data-prefecture="<?php echo esc_attr($pref_slug); ?>"
+                                   data-count="<?php echo esc_attr($actual_count); ?>"
+                                   title="<?php echo esc_attr($pref['name']); ?> (<?php echo $actual_count; ?>件)">
+                                    <span class="pref-name"><?php echo esc_html($pref['name']); ?></span>
+                                    <span class="pref-count"><?php echo $actual_count; ?></span>
+                                </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <!-- 統計サマリー -->
+                    <div class="map-statistics">
+                        <div class="stat-item">
+                            <span class="stat-label">対象地域</span>
+                            <span class="stat-value">47</span>
+                            <span class="stat-unit">都道府県</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">総助成金数</span>
+                            <span class="stat-value"><?php 
+                                $total_grants = 0;
+                                foreach ($prefectures as $pref) {
+                                    $total_grants += $pref->count;
+                                }
+                                echo $total_grants;
+                            ?></span>
+                            <span class="stat-unit">件</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">平均</span>
+                            <span class="stat-value"><?php 
+                                $active_prefectures = count($prefectures) > 0 ? count($prefectures) : 1;
+                                echo round($total_grants / $active_prefectures); 
+                            ?></span>
+                            <span class="stat-unit">件/県</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -613,14 +731,19 @@ if (function_exists('gi_get_cached_stats')) {
 .badge-count {
     font-size: 28px;
     font-weight: 900;
-    color: #000000;
+    color: #ffffff;
     display: block;
+    background: #000000;
+    padding: 8px 12px;
+    border-radius: 8px;
 }
 
 .badge-label {
     font-size: 12px;
-    color: #999999;
+    color: #000000;
     font-weight: 600;
+    margin-top: 4px;
+    display: block;
 }
 
 .card-title {
@@ -884,130 +1007,184 @@ a.recent-grant-item:hover {
 }
 
 .regions-container {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 40px;
-    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-/* 日本地図 */
-.japan-map {
-    position: relative;
-    background: #fafafa;
+/* 日本地図ラッパー */
+.japan-map-wrapper {
+    background: #000000;
     border-radius: 20px;
-    padding: 40px;
-    border: 2px solid #000000;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
-.map-svg {
-    width: 100%;
-    height: auto;
+.map-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #333333;
 }
 
-.region-block circle {
-    fill: #ffffff;
-    stroke: #000000;
-    stroke-width: 2;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.region-block:hover circle,
-.region-block.active circle,
-.region-block.hover circle {
-    fill: #000000;
-}
-
-.region-block.active circle {
-    stroke-width: 3;
-    stroke: #4CAF50;
-}
-
-.region-block text {
-    font-size: 12px;
+.map-instruction {
+    font-size: 18px;
     font-weight: 700;
-    fill: #000000;
-    pointer-events: none;
-    transition: fill 0.3s ease;
+    color: #ffffff;
+    letter-spacing: 0.05em;
 }
 
-.region-block:hover text,
-.region-block.active text,
-.region-block.hover text {
-    fill: #ffffff;
+/* 地域グリッド */
+.japan-regions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
-/* 都道府県アイテムのハイライト状態 */
-.prefecture-item.highlighted {
-    background: #E8F5E9 !important;
-    border-color: #4CAF50 !important;
-    opacity: 1 !important;
+.region-group {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 都道府県リスト */
-.prefecture-list {
+.region-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.prefecture-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
 }
 
-.prefecture-item {
+/* 都道府県ボックス */
+.prefecture-box {
     position: relative;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.prefecture-item:hover {
-    background: #000000;
-    border-color: #000000;
-}
-
-.prefecture-item.featured {
-    border: 2px solid #000000;
-}
-
-.prefecture-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #000000;
-    transition: color 0.3s ease;
-}
-
-.prefecture-item:hover .prefecture-name {
-    color: #ffffff;
-}
-
-.prefecture-count {
-    font-size: 12px;
-    font-weight: 700;
-    color: #666666;
-    transition: color 0.3s ease;
-}
-
-.prefecture-item:hover .prefecture-count {
-    color: #cccccc;
-}
-
-.featured-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 24px;
-    height: 24px;
-    background: #000000;
-    border-radius: 50%;
-    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 12px 8px;
+    background: #ffffff;
+    border: 2px solid #333333;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 60px;
+}
+
+.prefecture-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    background: #333333;
+    border-color: #ffffff;
+}
+
+.prefecture-box.has-grants {
+    background: #1a1a1a;
+    border-color: #4CAF50;
+}
+
+.prefecture-box.has-grants:hover {
+    background: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.prefecture-box.no-grants {
+    opacity: 0.5;
+    background: #2a2a2a;
+    border-color: #555555;
+}
+
+.pref-name {
+    font-size: 13px;
+    font-weight: 700;
     color: #ffffff;
-    font-size: 10px;
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+.prefecture-box:hover .pref-name {
+    color: #ffffff;
+}
+
+.prefecture-box.has-grants .pref-name {
+    color: #4CAF50;
+}
+
+.prefecture-box.has-grants:hover .pref-name {
+    color: #ffffff;
+}
+
+.pref-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: #999999;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.prefecture-box:hover .pref-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.prefecture-box.has-grants .pref-count {
+    background: rgba(76, 175, 80, 0.2);
+    color: #81C784;
+}
+
+.prefecture-box.has-grants:hover .pref-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+/* 統計サマリー */
+.map-statistics {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid #333333;
+}
+
+.map-statistics .stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.map-statistics .stat-label {
+    display: block;
+    font-size: 12px;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+.map-statistics .stat-value {
+    display: block;
+    font-size: 32px;
+    font-weight: 900;
+    color: #4CAF50;
+    line-height: 1;
+}
+
+.map-statistics .stat-unit {
+    display: block;
+    font-size: 11px;
+    color: #666666;
+    margin-top: 4px;
 }
 
 /* CTA */
@@ -1123,12 +1300,29 @@ a.recent-grant-item:hover {
     }
     
     .regions-container {
-        grid-template-columns: 1fr;
+        padding: 0 15px;
     }
     
-    .japan-map {
-        max-width: 400px;
-        margin: 0 auto;
+    .japan-map-wrapper {
+        padding: 20px;
+    }
+    
+    .prefecture-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+    }
+    
+    .prefecture-box {
+        min-height: 50px;
+        padding: 10px 6px;
+    }
+    
+    .pref-name {
+        font-size: 12px;
+    }
+    
+    .pref-count {
+        font-size: 10px;
     }
 }
 
@@ -1154,8 +1348,58 @@ a.recent-grant-item:hover {
         grid-template-columns: 1fr;
     }
     
-    .prefecture-list {
-        grid-template-columns: repeat(2, 1fr);
+    .japan-map-wrapper {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .map-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    .map-instruction {
+        font-size: 16px;
+    }
+    
+    .region-group {
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .region-label {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .prefecture-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+    
+    .prefecture-box {
+        min-height: 45px;
+        padding: 8px 4px;
+    }
+    
+    .pref-name {
+        font-size: 11px;
+    }
+    
+    .pref-count {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    
+    .map-statistics {
+        flex-direction: column;
+        gap: 15px;
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+    
+    .map-statistics .stat-value {
+        font-size: 24px;
     }
     
     .cta-section {
@@ -1164,6 +1408,89 @@ a.recent-grant-item:hover {
     
     .cta-title {
         font-size: 28px;
+    }
+}
+/* 波紋エフェクト */
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(0);
+    animation: ripple 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* 検索ボックス */
+.prefecture-search-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.prefecture-search-input {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.prefecture-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.prefecture-search-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #4CAF50;
+}
+
+.search-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+}
+
+/* アクセシビリティ */
+.prefecture-box:focus {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: light) {
+    .japan-map-wrapper {
+        background: #ffffff;
+        border: 2px solid #000000;
+    }
+    
+    .map-instruction {
+        color: #000000;
+    }
+    
+    .region-label {
+        color: #000000;
+    }
+    
+    .prefecture-box {
+        background: #000000;
+        border-color: #ffffff;
+    }
+    
+    .pref-name {
+        color: #ffffff;
     }
 }
 </style>
@@ -1264,77 +1591,107 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // 地域と都道府県のマッピング
-    const regionPrefectureMap = {
-        'hokkaido': ['北海道'],
-        'tohoku': ['青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'],
-        'kanto': ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'],
-        'chubu': ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'],
-        'kinki': ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'],
-        'chugoku': ['鳥取県', '島根県', '岡山県', '広島県', '山口県'],
-        'shikoku': ['徳島県', '香川県', '愛媛県', '高知県'],
-        'kyushu': ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県']
-    };
+    // 47都道府県インタラクション
+    const prefectureBoxes = document.querySelectorAll('.prefecture-box');
+    const regionGroups = document.querySelectorAll('.region-group');
     
-    // 地域ブロッククリック
-    document.querySelectorAll('.region-block').forEach(block => {
-        block.addEventListener('click', function() {
+    // 都道府県ボックスのホバー効果
+    prefectureBoxes.forEach(box => {
+        box.addEventListener('mouseenter', function() {
             const region = this.getAttribute('data-region');
-            const prefectures = regionPrefectureMap[region] || [];
+            const prefecture = this.getAttribute('data-prefecture');
             
-            // 全ての地域ブロックの選択状態をリセット
-            document.querySelectorAll('.region-block').forEach(b => {
-                b.classList.remove('active');
-            });
-            
-            // クリックされた地域をアクティブに
-            this.classList.add('active');
-            
-            // 該当する都道府県をハイライト
-            document.querySelectorAll('.prefecture-item').forEach(item => {
-                const prefName = item.querySelector('.prefecture-name').textContent;
-                if (prefectures.includes(prefName)) {
-                    item.classList.add('highlighted');
-                    item.style.opacity = '1';
-                    item.style.background = '#f0f0f0';
-                } else {
-                    item.classList.remove('highlighted');
-                    item.style.opacity = '0.3';
-                    item.style.background = '';
+            // 同じ地域の都道府県をハイライト
+            document.querySelectorAll(`.prefecture-box[data-region="${region}"]`).forEach(pBox => {
+                if (pBox !== this) {
+                    pBox.style.opacity = '0.7';
                 }
             });
             
-            // 都道府県リストをスクロール
-            const prefectureList = document.querySelector('.prefecture-list');
-            if (prefectureList) {
-                prefectureList.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    });
-    
-    // 都道府県アイテムクリック時に地域も連動
-    document.querySelectorAll('.prefecture-item').forEach(item => {
-        item.addEventListener('mouseenter', function() {
-            const prefName = this.querySelector('.prefecture-name').textContent;
-            
-            // 該当する地域を探す
-            for (const [region, prefs] of Object.entries(regionPrefectureMap)) {
-                if (prefs.includes(prefName)) {
-                    const regionBlock = document.querySelector(`.region-block[data-region="${region}"]`);
-                    if (regionBlock) {
-                        regionBlock.classList.add('hover');
-                    }
-                    break;
-                }
+            // ツールチップ風の情報表示
+            const count = this.querySelector('.pref-count').textContent;
+            const name = this.querySelector('.pref-name').textContent;
+            if (parseInt(count) > 0) {
+                this.style.transform = 'translateY(-4px) scale(1.05)';
             }
         });
         
-        item.addEventListener('mouseleave', function() {
-            document.querySelectorAll('.region-block').forEach(block => {
-                block.classList.remove('hover');
+        box.addEventListener('mouseleave', function() {
+            // リセット
+            prefectureBoxes.forEach(pBox => {
+                pBox.style.opacity = '';
+                pBox.style.transform = '';
             });
         });
+        
+        // クリック時のアニメーション
+        box.addEventListener('click', function(e) {
+            // 波紋エフェクト
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
     });
+    
+    // 地域グループのホバー効果
+    regionGroups.forEach(group => {
+        group.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.08)';
+            this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        });
+        
+        group.addEventListener('mouseleave', function() {
+            this.style.background = '';
+            this.style.borderColor = '';
+        });
+    });
+    
+    // 検索機能（オプション）
+    const createSearchFilter = () => {
+        const mapWrapper = document.querySelector('.japan-map-wrapper');
+        if (!mapWrapper) return;
+        
+        const searchBox = document.createElement('div');
+        searchBox.className = 'prefecture-search-box';
+        searchBox.innerHTML = `
+            <input type="text" placeholder="都道府県を検索..." class="prefecture-search-input">
+            <i class="fas fa-search search-icon"></i>
+        `;
+        
+        mapWrapper.insertBefore(searchBox, mapWrapper.firstChild);
+        
+        const searchInput = searchBox.querySelector('.prefecture-search-input');
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            prefectureBoxes.forEach(box => {
+                const prefName = box.querySelector('.pref-name').textContent.toLowerCase();
+                if (prefName.includes(searchTerm) || searchTerm === '') {
+                    box.style.display = '';
+                    box.style.opacity = '';
+                } else {
+                    box.style.display = 'none';
+                }
+            });
+            
+            // 空の地域グループを非表示
+            regionGroups.forEach(group => {
+                const visibleBoxes = group.querySelectorAll('.prefecture-box:not([style*="display: none"])');
+                if (visibleBoxes.length === 0) {
+                    group.style.display = 'none';
+                } else {
+                    group.style.display = '';
+                }
+            });
+        });
+    };
+    
+    // 検索機能を初期化
+    // createSearchFilter();
     
     // パフォーマンス最適化：Intersection Observerでの遅延読み込み
     const lazyLoadObserver = new IntersectionObserver(function(entries) {
