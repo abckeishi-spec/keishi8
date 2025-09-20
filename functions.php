@@ -31,8 +31,11 @@ $required_files = array(
     '7-acf-setup.php',                // ACF関連
     '8-acf-fields-setup.php',         // ACFフィールド定義
     '9-mobile-optimization.php',      // モバイル最適化機能
-    '10-performance-helpers.php',      // パフォーマンス最適化ヘルパー
-    '12-ai_concierge_function.php'      // パフォーマンス最適化ヘルパー
+    '10-performance-helpers.php',     // パフォーマンス最適化ヘルパー
+    '11-grant-card-renderer.php',     // 助成金カードレンダラー
+    '12-ai_concierge_function.php',   // AIコンシェルジュ機能
+    '13-ai-enhanced-functions.php',   // AI強化機能（セマンティック検索、ストリーミング、音声認識）
+    '14-vector-database.php'          // ベクトルデータベース（セマンティック検索用）
 );
 
 // 各ファイルを安全に読み込み

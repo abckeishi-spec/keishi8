@@ -2079,6 +2079,16 @@ function startGrantSearch() {
             button.style.transform = '';
         }, 150);
     }
+    
+    // AIアシスタントを開いて検索を開始
+    if (window.aiAssistant) {
+        window.aiAssistant.openChat();
+        window.aiAssistant.elements.input.value = 'おすすめの助成金を教えてください';
+        window.aiAssistant.sendMessage();
+    } else {
+        // フォールバック: 助成金一覧ページへ遷移
+        window.location.href = '/grant/';
+    }
 }
 
 function openAIConsultation() {
@@ -2087,6 +2097,18 @@ function openAIConsultation() {
     const system = window.grantHeroStylishSystem;
     if (system && system.showNotification) {
         system.showNotification('💬 AI専門家相談', 'AI専門家が最適な助成金・補助金をご提案いたします');
+    }
+    
+    // AIアシスタントを開く
+    if (window.aiAssistant) {
+        window.aiAssistant.openChat();
+    } else {
+        // AIアシスタントがまだ読み込まれていない場合は遅延実行
+        setTimeout(() => {
+            if (window.aiAssistant) {
+                window.aiAssistant.openChat();
+            }
+        }, 1000);
     }
 }
 

@@ -2639,40 +2639,90 @@ class GI_Session_Manager {
 class GI_Semantic_Search_Engine {
     
     private $synonyms_map = [];
+    private $embeddings_cache = [];
+    private $vector_db = null;
+    private $similarity_threshold = 0.7;
     
     public function __construct() {
         $this->load_synonyms();
+        $this->init_vector_database();
     }
     
     /**
-     * 同義語マップ読み込み
+     * 同義語マップ読み込み（拡張版）
      */
     private function load_synonyms() {
         $this->synonyms_map = [
-            '助成金' => ['補助金', '支援金', '給付金', '支援制度'],
-            '中小企業' => ['小規模事業者', 'SME', '零細企業'],
-            '創業' => ['起業', '開業', 'スタートアップ', '新規事業'],
-            '設備投資' => ['機械導入', '設備購入', '機器更新', 'DX投資'],
-            '人材育成' => ['教育訓練', '研修', 'スキルアップ', '人材開発'],
-            '海外展開' => ['輸出', '国際展開', 'グローバル展開'],
-            '研究開発' => ['R&D', 'イノベーション', '技術開発'],
-            'IT化' => ['デジタル化', 'DX', 'システム導入', 'デジタルトランスフォーメーション'],
-            '省エネ' => ['環境対策', 'グリーン化', '脱炭素', '再生可能エネルギー']
+            '助成金' => ['補助金', '支援金', '給付金', '支援制度', 'サポート', '援助', 'ファンド'],
+            '中小企業' => ['小規模事業者', 'SME', '零細企業', '個人事業主', 'ベンチャー'],
+            '創業' => ['起業', '開業', 'スタートアップ', '新規事業', '独立', '法人設立'],
+            '設備投資' => ['機械導入', '設備購入', '機器更新', 'DX投資', '生産設備', '機械化'],
+            '人材育成' => ['教育訓練', '研修', 'スキルアップ', '人材開発', '社員教育', 'OJT'],
+            '海外展開' => ['輸出', '国際展開', 'グローバル展開', '越境EC', '海外進出'],
+            '研究開発' => ['R&D', 'イノベーション', '技術開発', '製品開発', '新技術'],
+            'IT化' => ['デジタル化', 'DX', 'システム導入', 'デジタルトランスフォーメーション', 'ICT'],
+            '省エネ' => ['環境対策', 'グリーン化', '脱炭素', '再生可能エネルギー', 'SDGs', 'カーボンニュートラル'],
+            '雇用' => ['採用', '就職', 'キャリア', '人材確保', '労働', 'ワークライフバランス'],
+            '資金調達' => ['融資', '借入', 'ローン', 'ファイナンス', '投資', 'クラウドファンディング'],
+            '生産性向上' => ['効率化', '改善', '最適化', 'コスト削減', '業務改善']
         ];
     }
     
     /**
-     * セマンティック検索実行
+     * ベクトルデータベース初期化
+     */
+    private function init_vector_database() {
+        // ベクトル検索用のインデックスを初期化
+        $this->vector_db = new GI_Vector_Database();
+        $this->build_grant_embeddings();
+    }
+    
+    /**
+     * 助成金データのベクトル化
+     */
+    private function build_grant_embeddings() {
+        $grants = get_posts([
+            'post_type' => 'grant',
+            'posts_per_page' => -1,
+            'post_status' => 'publish'
+        ]);
+        
+        foreach ($grants as $grant) {
+            $text = $this->prepare_grant_text($grant);
+            $embedding = $this->generate_embedding($text);
+            $this->vector_db->store($grant->ID, $embedding);
+        }
+    }
+    
+    /**
+     * セマンティック検索実行（完全版）
      */
     public function search($query, $filters = [], $page = 1, $per_page = 10) {
-        // クエリの前処理
+        // クエリの前処理と分析
         $processed_query = $this->preprocess_query($query);
+        $intent = $this->analyze_search_intent($processed_query);
         
-        // 同義語展開
+        // 同義語展開とクエリ拡張
         $expanded_query = $this->expand_synonyms($processed_query);
+        $semantic_keywords = $this->extract_semantic_keywords($expanded_query);
         
-        // 検索実行
-        $search_args = $this->build_search_args($expanded_query, $filters, $page, $per_page);
+        // ベクトル類似度検索
+        $vector_results = [];
+        if ($this->vector_db) {
+            $query_embedding = $this->generate_embedding($expanded_query);
+            $vector_results = $this->vector_db->search($query_embedding, 20);
+        }
+        
+        // ハイブリッド検索（キーワード + セマンティック）
+        $search_args = $this->build_hybrid_search_args(
+            $expanded_query,
+            $semantic_keywords,
+            $vector_results,
+            $filters,
+            $page,
+            $per_page
+        );
+        
         $query_obj = new WP_Query($search_args);
         
         $results = [];
@@ -2681,11 +2731,21 @@ class GI_Semantic_Search_Engine {
                 $query_obj->the_post();
                 $post_id = get_the_ID();
                 
+                // スコアリング計算
+                $relevance_score = $this->calculate_relevance_score(
+                    $post_id,
+                    $processed_query,
+                    $vector_results,
+                    $intent
+                );
+                
                 $results[] = [
                     'id' => $post_id,
                     'title' => get_the_title(),
                     'permalink' => get_permalink(),
                     'excerpt' => get_the_excerpt(),
+                    'relevance_score' => $relevance_score,
+                    'matched_keywords' => $this->get_matched_keywords($post_id, $semantic_keywords),
                     'relevance_score' => $this->calculate_relevance_score($post_id, $processed_query),
                     'meta' => $this->get_post_meta_for_search($post_id)
                 ];
