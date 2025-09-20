@@ -16,18 +16,52 @@ $session_id = 'gi_session_' . wp_generate_uuid4();
 $nonce = wp_create_nonce('gi_ai_search_nonce');
 ?>
 
-<!-- AI Grant Search Section -->
-<section id="ai-search-section" class="ai-search-wrapper" data-session-id="<?php echo esc_attr($session_id); ?>">
-    <div class="ai-container">
+<!-- AI Grant Search Section - Monochrome Professional Edition -->
+<section id="ai-search-section" class="monochrome-ai-search" data-session-id="<?php echo esc_attr($session_id); ?>">
+    <!-- 背景エフェクト（カテゴリーセクションと同じ） -->
+    <div class="background-effects">
+        <div class="grid-pattern"></div>
+        <div class="gradient-overlay"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </div>
+
+    <div class="section-container">
         
-        <!-- Section Header -->
-        <div class="ai-header">
-            <span class="ai-badge">AI POWERED</span>
-            <h2 class="ai-title">
-                <span class="title-en">GRANT SEARCH</span>
-                <span class="title-jp">補助金AI検索</span>
+        <!-- Section Header（カテゴリーセクションと同じスタイル） -->
+        <div class="section-header" data-aos="fade-up">
+            <div class="header-accent"></div>
+            
+            <h2 class="section-title">
+                <span class="title-en">AI POWERED SEARCH</span>
+                <span class="title-ja">補助金AI検索</span>
             </h2>
-            <p class="ai-subtitle">最適な補助金を瞬時に発見</p>
+            
+            <p class="section-description">
+                最適な補助金を瞬時に発見
+            </p>
+
+            <!-- 統計情報 -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-value" data-counter="<?php 
+                        $grant_posts = wp_count_posts('grant');
+                        echo isset($grant_posts->publish) ? $grant_posts->publish : 0;
+                    ?>">0</span>
+                    <span class="stat-label">登録補助金</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">24/7</span>
+                    <span class="stat-label">AI対応</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">0.3秒</span>
+                    <span class="stat-label">応答速度</span>
+                </div>
+            </div>
         </div>
 
         <!-- Main Search Interface -->
@@ -207,136 +241,256 @@ $nonce = wp_create_nonce('gi_ai_search_nonce');
                 </div>
             </div>
 
-            <!-- Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <span class="stat-number" data-count="<?php 
-                        $grant_posts = wp_count_posts('grant');
-                        echo isset($grant_posts->publish) ? $grant_posts->publish : 0;
-                    ?>">0</span>
-                    <span class="stat-label">登録補助金</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" data-count="47">0</span>
-                    <span class="stat-label">対応都道府県</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">AI対応</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">0.3秒</span>
-                    <span class="stat-label">平均応答時間</span>
-                </div>
-            </div>
+
         </div>
     </div>
 </section>
 
 <style>
-/* AI Search Section Styles */
-.ai-search-wrapper {
+/* Monochrome AI Search Section Styles */
+.monochrome-ai-search {
     position: relative;
-    padding: 80px 0;
-    background: #fff;
-    font-family: -apple-system, "SF Pro Display", "Helvetica Neue", "Hiragino Sans", sans-serif;
+    padding: 120px 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
     overflow: hidden;
 }
 
-.ai-search-wrapper::before {
-    content: '';
+/* 背景エフェクト（カテゴリーセクションと統一） */
+.background-effects {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #000, transparent);
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
 }
 
-.ai-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 20px;
+.grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
 }
 
-/* Header */
-.ai-header {
-    text-align: center;
-    margin-bottom: 60px;
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
 }
 
-.ai-badge {
-    display: inline-block;
-    padding: 6px 16px;
+.gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(0, 0, 0, 0.02) 0%, transparent 70%);
+}
+
+.floating-shapes {
+    position: absolute;
+    inset: 0;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.05;
+}
+
+.shape-1 {
+    width: 400px;
+    height: 400px;
     background: #000;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    border-radius: 20px;
-    margin-bottom: 20px;
+    top: -200px;
+    left: -200px;
+    animation: float-1 20s ease-in-out infinite;
 }
 
-.ai-title {
-    margin: 0;
+.shape-2 {
+    width: 300px;
+    height: 300px;
+    background: #333;
+    bottom: -150px;
+    right: -150px;
+    animation: float-2 25s ease-in-out infinite;
+}
+
+.shape-3 {
+    width: 250px;
+    height: 250px;
+    background: #666;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: float-3 30s ease-in-out infinite;
+}
+
+@keyframes float-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(100px, 50px) scale(1.1); }
+}
+
+@keyframes float-2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-50px, -100px) rotate(180deg); }
+}
+
+@keyframes float-3 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.section-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+    z-index: 1;
+}
+
+/* セクションヘッダー（カテゴリーと統一） */
+.section-header {
+    text-align: center;
+    margin-bottom: 80px;
+    position: relative;
+}
+
+.header-accent {
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #000, transparent);
+    margin: 0 auto 40px;
+    animation: accent-pulse 3s ease-in-out infinite;
+}
+
+@keyframes accent-pulse {
+    0%, 100% { opacity: 0.3; transform: scaleX(1); }
+    50% { opacity: 1; transform: scaleX(1.5); }
+}
+
+.section-title {
+    margin: 0 0 20px;
 }
 
 .title-en {
     display: block;
-    font-size: 48px;
+    font-size: clamp(32px, 5vw, 56px);
     font-weight: 900;
     letter-spacing: -0.02em;
     line-height: 1;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #000 0%, #333 100%);
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #000 0%, #333 50%, #000 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradient-shift 5s ease infinite;
 }
 
-.title-jp {
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.title-ja {
     display: block;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    color: #666;
-}
-
-.ai-subtitle {
-    margin: 16px 0 0;
     font-size: 16px;
-    color: #333;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: #666;
+    margin-bottom: 20px;
 }
 
-/* Search Bar */
+.section-description {
+    font-size: 18px;
+    color: #888;
+    letter-spacing: 0.05em;
+    margin: 0 auto 40px;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* 統計情報（カテゴリーと統一） */
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-top: 40px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 36px;
+    font-weight: 900;
+    color: #000;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #999;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* モノクローム検索バー */
 .ai-search-bar {
     position: relative;
-    max-width: 720px;
-    margin: 0 auto 32px;
+    max-width: 800px;
+    margin: 0 auto 48px;
 }
 
 .search-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    background: #f8f8f8;
-    border: 2px solid transparent;
-    border-radius: 60px;
-    transition: all 0.3s;
+    background: #fff;
+    border: 2px solid #000;
+    border-radius: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.search-input-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #000;
+    transition: width 0.3s ease;
+}
+
+.search-input-wrapper:focus-within::before {
+    width: 100%;
 }
 
 .search-input-wrapper:focus-within {
-    background: #fff;
-    border-color: #000;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
 }
 
 .search-input {
     flex: 1;
-    padding: 18px 24px;
+    padding: 20px 24px;
     background: none;
     border: none;
     font-size: 16px;
+    font-weight: 500;
     outline: none;
+    letter-spacing: 0.02em;
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-weight: 400;
 }
 
 .search-actions {
@@ -347,43 +501,70 @@ $nonce = wp_create_nonce('gi_ai_search_nonce');
 }
 
 .voice-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border: none;
-    background: none;
-    color: #999;
+    background: transparent;
+    color: #666;
     cursor: pointer;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    position: relative;
 }
 
-.voice-btn:hover {
-    background: #f0f0f0;
-    color: #000;
-}
-
-.search-btn {
-    height: 44px;
-    padding: 0 24px;
-    background: #000;
-    color: #fff;
-    border: none;
-    border-radius: 22px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.voice-btn::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 2px solid transparent;
     transition: all 0.2s;
 }
 
+.voice-btn:hover {
+    color: #000;
+}
+
+.voice-btn:hover::after {
+    border-color: #000;
+}
+
+.search-btn {
+    height: 48px;
+    padding: 0 32px;
+    background: #000;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.search-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.search-btn:hover::before {
+    transform: translateX(100%);
+}
+
 .search-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .search-btn:active {
@@ -439,37 +620,57 @@ $nonce = wp_create_nonce('gi_ai_search_nonce');
     font-size: 16px;
 }
 
-/* Quick Filters */
+/* モノクロームフィルター */
 .quick-filters {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 48px;
+    gap: 16px;
+    margin-bottom: 60px;
 }
 
 .filter-chip {
-    padding: 10px 20px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 24px;
+    padding: 12px 24px;
+    background: transparent;
+    border: 2px solid #000;
     font-size: 13px;
-    font-weight: 500;
-    color: #666;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #000;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-chip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+}
+
+.filter-chip:hover::before {
+    transform: scaleX(1);
 }
 
 .filter-chip:hover {
-    border-color: #000;
-    color: #000;
+    color: #fff;
     transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .filter-chip.active {
     background: #000;
     color: #fff;
-    border-color: #000;
+}
+
+.filter-chip.active::before {
+    transform: scaleX(1);
 }
 
 /* Main Content */
@@ -744,41 +945,70 @@ $nonce = wp_create_nonce('gi_ai_search_nonce');
     fill: currentColor;
 }
 
-/* Grant Cards */
+/* モノクロームグラントカード */
 .featured-grants,
 .results-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
 }
 
 .grant-card {
     position: relative;
     background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    transition: all 0.3s;
+    padding: 30px;
+    border: 2px solid #000;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    overflow: hidden;
+}
+
+.grant-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+}
+
+.grant-card:hover::before {
+    transform: scaleX(1);
+}
+
+.grant-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.grant-card:hover::after {
+    opacity: 1;
 }
 
 .grant-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-    border-color: #000;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
 .card-badge {
     position: absolute;
-    top: -8px;
-    right: 16px;
-    padding: 4px 12px;
+    top: 0;
+    right: 0;
+    padding: 8px 16px;
     background: #000;
     color: #fff;
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    border-radius: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 }
 
 .card-title {
@@ -890,35 +1120,7 @@ $nonce = wp_create_nonce('gi_ai_search_nonce');
     to { transform: rotate(360deg); }
 }
 
-/* Stats Bar */
-.stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    padding: 32px;
-    background: linear-gradient(135deg, #f8f8f8 0%, #fff 100%);
-    border-radius: 20px;
-    text-align: center;
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.stat-number {
-    font-size: 32px;
-    font-weight: 900;
-    color: #000;
-    font-variant-numeric: tabular-nums;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #666;
-    letter-spacing: 0.05em;
-}
+/* 削除 - 統計はヘッダーに統合済み */
 
 /* Notification System */
 .ai-notification {
@@ -1046,34 +1248,59 @@ $nonce = wp_create_nonce('gi_ai_search_nonce');
 @media (max-width: 1024px) {
     .ai-main-content {
         grid-template-columns: 1fr;
-        gap: 24px;
+        gap: 30px;
     }
     
     .ai-assistant-panel {
-        height: 400px;
+        height: 450px;
+    }
+    
+    .section-container {
+        padding: 0 30px;
     }
 }
 
 @media (max-width: 768px) {
+    .monochrome-ai-search {
+        padding: 80px 0;
+    }
+    
+    .section-header {
+        margin-bottom: 50px;
+    }
+    
     .title-en {
-        font-size: 32px;
+        font-size: 28px;
     }
     
     .quick-filters {
         overflow-x: auto;
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
+        padding: 0 20px;
+        margin: 0 -20px 40px;
     }
     
-    .stats-bar {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        padding: 20px;
+    .filter-chip {
+        flex-shrink: 0;
+    }
+    
+    .stats-row {
+        gap: 30px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
     }
     
     .featured-grants,
     .results-container {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .section-container {
+        padding: 0 20px;
     }
 }
 </style>
