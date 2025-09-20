@@ -2805,12 +2805,10 @@ class GI_Semantic_Search_Engine {
                 $query_obj->the_post();
                 $post_id = get_the_ID();
                 
-                // スコアリング計算
+                // スコアリング計算（既存のメソッドを使用）
                 $relevance_score = $this->calculate_relevance_score(
                     $post_id,
-                    $processed_query,
-                    $vector_results,
-                    $intent
+                    $processed_query
                 );
                 
                 $results[] = [
@@ -3019,7 +3017,7 @@ class GI_Semantic_Search_Engine {
     }
     
     /**
-     * 検索意図分析
+     * 検索意図分析（既存のメソッドを補完）
      */
     private function analyze_search_intent($query) {
         $intent = [
@@ -3043,7 +3041,7 @@ class GI_Semantic_Search_Engine {
     }
     
     /**
-     * セマンティックキーワード抽出
+     * セマンティックキーワード抽出（既存のメソッドを補完）
      */
     private function extract_semantic_keywords($query) {
         $keywords = [];
@@ -3066,7 +3064,7 @@ class GI_Semantic_Search_Engine {
     }
     
     /**
-     * ハイブリッド検索引数構築
+     * ハイブリッド検索引数構築（既存のメソッドを補完）
      */
     private function build_hybrid_search_args($expanded_query, $semantic_keywords, $vector_results, $filters, $page, $per_page) {
         $search_args = [
@@ -3110,32 +3108,7 @@ class GI_Semantic_Search_Engine {
     }
     
     /**
-     * 関連度スコア計算
-     */
-    private function calculate_relevance_score($post_id, $query, $vector_results, $intent) {
-        $score = 0.5; // 基本スコア
-        
-        // ベクトル類似度スコア
-        if (is_array($vector_results)) {
-            foreach ($vector_results as $result) {
-                if (isset($result['post_id']) && $result['post_id'] == $post_id) {
-                    $score += $result['similarity'] * 0.3;
-                    break;
-                }
-            }
-        }
-        
-        // タイトルマッチング
-        $title = get_the_title($post_id);
-        if (strpos($title, $query) !== false) {
-            $score += 0.2;
-        }
-        
-        return min(1.0, $score);
-    }
-    
-    /**
-     * マッチしたキーワード取得
+     * マッチしたキーワード取得（新規追加）
      */
     private function get_matched_keywords($post_id, $keywords) {
         $matched = [];
