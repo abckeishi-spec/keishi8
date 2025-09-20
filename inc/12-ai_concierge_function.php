@@ -2681,6 +2681,11 @@ class GI_Semantic_Search_Engine {
      * 助成金データのベクトル化
      */
     private function build_grant_embeddings() {
+        // ベクトルデータベースが利用可能な場合のみ実行
+        if (!class_exists('GI_Vector_Database')) {
+            return;
+        }
+        
         $grants = get_posts([
             'post_type' => 'grant',
             'posts_per_page' => -1,
@@ -2690,8 +2695,77 @@ class GI_Semantic_Search_Engine {
         foreach ($grants as $grant) {
             $text = $this->prepare_grant_text($grant);
             $embedding = $this->generate_embedding($text);
-            $this->vector_db->store($grant->ID, $embedding);
+            if ($this->vector_db) {
+                $this->vector_db->store($grant->ID, $embedding);
+            }
         }
+    }
+    
+    /**
+     * 助成金テキスト準備
+     */
+    private function prepare_grant_text($grant) {
+        $text = '';
+        
+        // タイトル
+        $text .= $grant->post_title . ' ';
+        
+        // 内容
+        $text .= wp_strip_all_tags($grant->post_content) . ' ';
+        
+        // ACFフィールド
+        if (function_exists('get_field')) {
+            $fields = [
+                'target_industry' => '対象業種',
+                'target_region' => '対象地域',
+                'requirements' => '申請要件',
+                'max_amount' => '最大金額'
+            ];
+            
+            foreach ($fields as $field => $label) {
+                $value = get_field($field, $grant->ID);
+                if ($value) {
+                    $text .= $label . ': ' . $value . ' ';
+                }
+            }
+        }
+        
+        return $text;
+    }
+    
+    /**
+     * エンベディング生成（簡易版）
+     */
+    private function generate_embedding($text) {
+        // 簡易的なベクトル化（実際はOpenAI APIなどを使用）
+        $words = $this->tokenize_text($text);
+        $vector = [];
+        
+        // 単語頻度ベースの簡易ベクトル
+        $word_counts = array_count_values($words);
+        $max_count = max($word_counts);
+        
+        foreach ($word_counts as $word => $count) {
+            $vector[] = $count / $max_count;
+        }
+        
+        // ベクトルサイズを固定（例：100次元）
+        while (count($vector) < 100) {
+            $vector[] = 0;
+        }
+        
+        return array_slice($vector, 0, 100);
+    }
+    
+    /**
+     * テキストのトークン化
+     */
+    private function tokenize_text($text) {
+        // 簡易的な日本語トークン化
+        $text = mb_strtolower($text);
+        $text = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $text);
+        $words = preg_split('/\s+/', $text);
+        return array_filter($words);
     }
     
     /**
@@ -2942,6 +3016,140 @@ class GI_Semantic_Search_Engine {
             'difficulty' => get_post_meta($post_id, 'grant_difficulty', true),
             'success_rate' => get_post_meta($post_id, 'grant_success_rate', true)
         ];
+    }
+    
+    /**
+     * 検索意図分析
+     */
+    private function analyze_search_intent($query) {
+        $intent = [
+            'intent' => 'search_grants',
+            'confidence' => 0.8,
+            'type' => 'general'
+        ];
+        
+        // キーワードベースの意図判定
+        if (strpos($query, '申請') !== false || strpos($query, '手続き') !== false) {
+            $intent['intent'] = 'application_help';
+        } elseif (strpos($query, '締切') !== false || strpos($query, '期限') !== false) {
+            $intent['intent'] = 'deadline_inquiry';
+        } elseif (strpos($query, '金額') !== false || strpos($query, 'いくら') !== false) {
+            $intent['intent'] = 'amount_inquiry';
+        } elseif (strpos($query, '対象') !== false || strpos($query, '該当') !== false) {
+            $intent['intent'] = 'eligibility_check';
+        }
+        
+        return $intent;
+    }
+    
+    /**
+     * セマンティックキーワード抽出
+     */
+    private function extract_semantic_keywords($query) {
+        $keywords = [];
+        
+        // 重要キーワードのパターン
+        $patterns = [
+            '助成金', '補助金', '支援金', '給付金',
+            '中小企業', '個人事業主', 'スタートアップ',
+            '設備投資', '人材育成', '研究開発', 'IT化',
+            '申請', '締切', '対象', '条件'
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (strpos($query, $pattern) !== false) {
+                $keywords[] = $pattern;
+            }
+        }
+        
+        return $keywords;
+    }
+    
+    /**
+     * ハイブリッド検索引数構築
+     */
+    private function build_hybrid_search_args($expanded_query, $semantic_keywords, $vector_results, $filters, $page, $per_page) {
+        $search_args = [
+            'post_type' => 'grant',
+            'post_status' => 'publish',
+            'posts_per_page' => $per_page,
+            'paged' => $page,
+            'meta_query' => []
+        ];
+        
+        // キーワード検索
+        if (!empty($semantic_keywords)) {
+            $search_args['s'] = implode(' ', $semantic_keywords);
+        } elseif (!empty($expanded_query)) {
+            $search_args['s'] = $expanded_query;
+        }
+        
+        // フィルター適用
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if (!empty($value)) {
+                    $search_args['meta_query'][] = [
+                        'key' => $key,
+                        'value' => $value,
+                        'compare' => 'LIKE'
+                    ];
+                }
+            }
+        }
+        
+        // ベクトル検索結果がある場合は優先
+        if (!empty($vector_results)) {
+            $post_ids = array_column($vector_results, 'post_id');
+            if (!empty($post_ids)) {
+                $search_args['post__in'] = $post_ids;
+                $search_args['orderby'] = 'post__in';
+            }
+        }
+        
+        return $search_args;
+    }
+    
+    /**
+     * 関連度スコア計算
+     */
+    private function calculate_relevance_score($post_id, $query, $vector_results, $intent) {
+        $score = 0.5; // 基本スコア
+        
+        // ベクトル類似度スコア
+        if (is_array($vector_results)) {
+            foreach ($vector_results as $result) {
+                if (isset($result['post_id']) && $result['post_id'] == $post_id) {
+                    $score += $result['similarity'] * 0.3;
+                    break;
+                }
+            }
+        }
+        
+        // タイトルマッチング
+        $title = get_the_title($post_id);
+        if (strpos($title, $query) !== false) {
+            $score += 0.2;
+        }
+        
+        return min(1.0, $score);
+    }
+    
+    /**
+     * マッチしたキーワード取得
+     */
+    private function get_matched_keywords($post_id, $keywords) {
+        $matched = [];
+        $content = get_post_field('post_content', $post_id);
+        $title = get_the_title($post_id);
+        $text = $title . ' ' . $content;
+        
+        foreach ($keywords as $keyword) {
+            if (strpos($text, $keyword) !== false) {
+                $matched[] = $keyword;
+            }
+        }
+        
+        return $matched;
     }
 }
 
