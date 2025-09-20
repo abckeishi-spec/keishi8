@@ -1,0 +1,245 @@
+<svg viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg" class="japan-svg-map">
+  <!-- 日本地図 SVG - 都道府県別 -->
+  
+  <!-- 北海道 -->
+  <g class="prefecture hokkaido" data-code="01" data-name="北海道" data-region="hokkaido">
+    <path d="M 720 80 L 780 60 L 820 70 L 850 100 L 860 140 L 840 180 L 800 200 L 750 190 L 700 170 L 680 140 L 690 100 L 720 80 Z"/>
+  </g>
+  
+  <!-- 東北地方 -->
+  <!-- 青森 -->
+  <g class="prefecture aomori" data-code="02" data-name="青森" data-region="tohoku">
+    <path d="M 720 220 L 760 220 L 770 250 L 750 280 L 710 280 L 700 250 L 720 220 Z"/>
+  </g>
+  
+  <!-- 岩手 -->
+  <g class="prefecture iwate" data-code="03" data-name="岩手" data-region="tohoku">
+    <path d="M 770 250 L 800 250 L 810 300 L 790 330 L 760 320 L 750 280 L 770 250 Z"/>
+  </g>
+  
+  <!-- 宮城 -->
+  <g class="prefecture miyagi" data-code="04" data-name="宮城" data-region="tohoku">
+    <path d="M 760 320 L 790 330 L 800 360 L 780 380 L 750 370 L 740 340 L 760 320 Z"/>
+  </g>
+  
+  <!-- 秋田 -->
+  <g class="prefecture akita" data-code="05" data-name="秋田" data-region="tohoku">
+    <path d="M 700 280 L 730 280 L 740 320 L 720 340 L 690 330 L 680 300 L 700 280 Z"/>
+  </g>
+  
+  <!-- 山形 -->
+  <g class="prefecture yamagata" data-code="06" data-name="山形" data-region="tohoku">
+    <path d="M 690 330 L 720 340 L 730 370 L 710 390 L 680 380 L 670 350 L 690 330 Z"/>
+  </g>
+  
+  <!-- 福島 -->
+  <g class="prefecture fukushima" data-code="07" data-name="福島" data-region="tohoku">
+    <path d="M 730 370 L 780 380 L 790 420 L 760 440 L 710 430 L 700 390 L 730 370 Z"/>
+  </g>
+  
+  <!-- 関東地方 -->
+  <!-- 茨城 -->
+  <g class="prefecture ibaraki" data-code="08" data-name="茨城" data-region="kanto">
+    <path d="M 760 440 L 790 450 L 800 490 L 780 510 L 750 500 L 740 460 L 760 440 Z"/>
+  </g>
+  
+  <!-- 栃木 -->
+  <g class="prefecture tochigi" data-code="09" data-name="栃木" data-region="kanto">
+    <path d="M 710 430 L 740 440 L 740 470 L 720 490 L 690 480 L 690 450 L 710 430 Z"/>
+  </g>
+  
+  <!-- 群馬 -->
+  <g class="prefecture gunma" data-code="10" data-name="群馬" data-region="kanto">
+    <path d="M 660 440 L 690 450 L 690 480 L 670 500 L 640 490 L 640 460 L 660 440 Z"/>
+  </g>
+  
+  <!-- 埼玉 -->
+  <g class="prefecture saitama" data-code="11" data-name="埼玉" data-region="kanto">
+    <path d="M 700 490 L 730 500 L 730 520 L 710 530 L 680 520 L 680 500 L 700 490 Z"/>
+  </g>
+  
+  <!-- 千葉 -->
+  <g class="prefecture chiba" data-code="12" data-name="千葉" data-region="kanto">
+    <path d="M 780 510 L 810 520 L 820 560 L 800 580 L 770 570 L 760 530 L 780 510 Z"/>
+  </g>
+  
+  <!-- 東京 -->
+  <g class="prefecture tokyo" data-code="13" data-name="東京" data-region="kanto">
+    <path d="M 730 520 L 760 530 L 760 550 L 740 560 L 710 550 L 710 530 L 730 520 Z"/>
+  </g>
+  
+  <!-- 神奈川 -->
+  <g class="prefecture kanagawa" data-code="14" data-name="神奈川" data-region="kanto">
+    <path d="M 730 550 L 760 560 L 760 580 L 740 590 L 710 580 L 710 560 L 730 550 Z"/>
+  </g>
+  
+  <!-- 中部地方 -->
+  <!-- 新潟 -->
+  <g class="prefecture niigata" data-code="15" data-name="新潟" data-region="chubu">
+    <path d="M 640 380 L 670 390 L 680 440 L 660 460 L 620 450 L 610 400 L 640 380 Z"/>
+  </g>
+  
+  <!-- 富山 -->
+  <g class="prefecture toyama" data-code="16" data-name="富山" data-region="chubu">
+    <path d="M 580 440 L 610 450 L 610 470 L 590 480 L 560 470 L 560 450 L 580 440 Z"/>
+  </g>
+  
+  <!-- 石川 -->
+  <g class="prefecture ishikawa" data-code="17" data-name="石川" data-region="chubu">
+    <path d="M 530 430 L 560 440 L 560 480 L 540 500 L 510 490 L 510 450 L 530 430 Z"/>
+  </g>
+  
+  <!-- 福井 -->
+  <g class="prefecture fukui" data-code="18" data-name="福井" data-region="chubu">
+    <path d="M 510 490 L 540 500 L 540 530 L 520 540 L 490 530 L 490 510 L 510 490 Z"/>
+  </g>
+  
+  <!-- 山梨 -->
+  <g class="prefecture yamanashi" data-code="19" data-name="山梨" data-region="chubu">
+    <path d="M 670 520 L 690 530 L 690 550 L 670 560 L 650 550 L 650 530 L 670 520 Z"/>
+  </g>
+  
+  <!-- 長野 -->
+  <g class="prefecture nagano" data-code="20" data-name="長野" data-region="chubu">
+    <path d="M 620 470 L 650 480 L 650 520 L 630 540 L 600 530 L 600 490 L 620 470 Z"/>
+  </g>
+  
+  <!-- 岐阜 -->
+  <g class="prefecture gifu" data-code="21" data-name="岐阜" data-region="chubu">
+    <path d="M 570 490 L 600 500 L 600 540 L 580 560 L 550 550 L 550 510 L 570 490 Z"/>
+  </g>
+  
+  <!-- 静岡 -->
+  <g class="prefecture shizuoka" data-code="22" data-name="静岡" data-region="chubu">
+    <path d="M 670 560 L 710 570 L 720 600 L 700 610 L 660 600 L 650 570 L 670 560 Z"/>
+  </g>
+  
+  <!-- 愛知 -->
+  <g class="prefecture aichi" data-code="23" data-name="愛知" data-region="chubu">
+    <path d="M 620 560 L 650 570 L 650 590 L 630 600 L 600 590 L 600 570 L 620 560 Z"/>
+  </g>
+  
+  <!-- 近畿地方 -->
+  <!-- 三重 -->
+  <g class="prefecture mie" data-code="24" data-name="三重" data-region="kinki">
+    <path d="M 600 590 L 630 600 L 630 640 L 610 650 L 580 640 L 580 610 L 600 590 Z"/>
+  </g>
+  
+  <!-- 滋賀 -->
+  <g class="prefecture shiga" data-code="25" data-name="滋賀" data-region="kinki">
+    <path d="M 550 550 L 570 560 L 570 580 L 550 590 L 530 580 L 530 560 L 550 550 Z"/>
+  </g>
+  
+  <!-- 京都 -->
+  <g class="prefecture kyoto" data-code="26" data-name="京都" data-region="kinki">
+    <path d="M 510 540 L 530 550 L 530 590 L 510 600 L 490 590 L 490 560 L 510 540 Z"/>
+  </g>
+  
+  <!-- 大阪 -->
+  <g class="prefecture osaka" data-code="27" data-name="大阪" data-region="kinki">
+    <path d="M 530 590 L 550 600 L 550 620 L 530 630 L 510 620 L 510 600 L 530 590 Z"/>
+  </g>
+  
+  <!-- 兵庫 -->
+  <g class="prefecture hyogo" data-code="28" data-name="兵庫" data-region="kinki">
+    <path d="M 470 560 L 490 570 L 490 610 L 470 620 L 450 610 L 450 580 L 470 560 Z"/>
+  </g>
+  
+  <!-- 奈良 -->
+  <g class="prefecture nara" data-code="29" data-name="奈良" data-region="kinki">
+    <path d="M 550 600 L 570 610 L 570 630 L 550 640 L 530 630 L 530 610 L 550 600 Z"/>
+  </g>
+  
+  <!-- 和歌山 -->
+  <g class="prefecture wakayama" data-code="30" data-name="和歌山" data-region="kinki">
+    <path d="M 530 630 L 550 640 L 550 670 L 530 680 L 510 670 L 510 650 L 530 630 Z"/>
+  </g>
+  
+  <!-- 中国地方 -->
+  <!-- 鳥取 -->
+  <g class="prefecture tottori" data-code="31" data-name="鳥取" data-region="chugoku">
+    <path d="M 420 540 L 450 550 L 450 570 L 430 580 L 400 570 L 400 550 L 420 540 Z"/>
+  </g>
+  
+  <!-- 島根 -->
+  <g class="prefecture shimane" data-code="32" data-name="島根" data-region="chugoku">
+    <path d="M 370 540 L 400 550 L 400 570 L 380 580 L 350 570 L 350 550 L 370 540 Z"/>
+  </g>
+  
+  <!-- 岡山 -->
+  <g class="prefecture okayama" data-code="33" data-name="岡山" data-region="chugoku">
+    <path d="M 420 580 L 450 590 L 450 610 L 430 620 L 400 610 L 400 590 L 420 580 Z"/>
+  </g>
+  
+  <!-- 広島 -->
+  <g class="prefecture hiroshima" data-code="34" data-name="広島" data-region="chugoku">
+    <path d="M 370 580 L 400 590 L 400 610 L 380 620 L 350 610 L 350 590 L 370 580 Z"/>
+  </g>
+  
+  <!-- 山口 -->
+  <g class="prefecture yamaguchi" data-code="35" data-name="山口" data-region="chugoku">
+    <path d="M 310 590 L 350 600 L 350 620 L 330 630 L 290 620 L 290 600 L 310 590 Z"/>
+  </g>
+  
+  <!-- 四国地方 -->
+  <!-- 徳島 -->
+  <g class="prefecture tokushima" data-code="36" data-name="徳島" data-region="shikoku">
+    <path d="M 490 670 L 510 680 L 510 700 L 490 710 L 470 700 L 470 680 L 490 670 Z"/>
+  </g>
+  
+  <!-- 香川 -->
+  <g class="prefecture kagawa" data-code="37" data-name="香川" data-region="shikoku">
+    <path d="M 450 650 L 470 660 L 470 680 L 450 690 L 430 680 L 430 660 L 450 650 Z"/>
+  </g>
+  
+  <!-- 愛媛 -->
+  <g class="prefecture ehime" data-code="38" data-name="愛媛" data-region="shikoku">
+    <path d="M 400 660 L 430 670 L 430 690 L 410 700 L 380 690 L 380 670 L 400 660 Z"/>
+  </g>
+  
+  <!-- 高知 -->
+  <g class="prefecture kochi" data-code="39" data-name="高知" data-region="shikoku">
+    <path d="M 420 700 L 470 710 L 470 730 L 450 740 L 400 730 L 400 710 L 420 700 Z"/>
+  </g>
+  
+  <!-- 九州地方 -->
+  <!-- 福岡 -->
+  <g class="prefecture fukuoka" data-code="40" data-name="福岡" data-region="kyushu">
+    <path d="M 270 620 L 300 630 L 300 650 L 280 660 L 250 650 L 250 630 L 270 620 Z"/>
+  </g>
+  
+  <!-- 佐賀 -->
+  <g class="prefecture saga" data-code="41" data-name="佐賀" data-region="kyushu">
+    <path d="M 230 650 L 250 660 L 250 680 L 230 690 L 210 680 L 210 660 L 230 650 Z"/>
+  </g>
+  
+  <!-- 長崎 -->
+  <g class="prefecture nagasaki" data-code="42" data-name="長崎" data-region="kyushu">
+    <path d="M 190 660 L 210 670 L 210 700 L 190 710 L 170 700 L 170 680 L 190 660 Z"/>
+  </g>
+  
+  <!-- 熊本 -->
+  <g class="prefecture kumamoto" data-code="43" data-name="熊本" data-region="kyushu">
+    <path d="M 250 690 L 280 700 L 280 720 L 260 730 L 230 720 L 230 700 L 250 690 Z"/>
+  </g>
+  
+  <!-- 大分 -->
+  <g class="prefecture oita" data-code="44" data-name="大分" data-region="kyushu">
+    <path d="M 300 650 L 330 660 L 330 680 L 310 690 L 280 680 L 280 660 L 300 650 Z"/>
+  </g>
+  
+  <!-- 宮崎 -->
+  <g class="prefecture miyazaki" data-code="45" data-name="宮崎" data-region="kyushu">
+    <path d="M 290 720 L 320 730 L 320 760 L 300 770 L 270 760 L 270 740 L 290 720 Z"/>
+  </g>
+  
+  <!-- 鹿児島 -->
+  <g class="prefecture kagoshima" data-code="46" data-name="鹿児島" data-region="kyushu">
+    <path d="M 250 760 L 280 770 L 280 800 L 260 810 L 230 800 L 230 780 L 250 760 Z"/>
+  </g>
+  
+  <!-- 沖縄 -->
+  <g class="prefecture okinawa" data-code="47" data-name="沖縄" data-region="kyushu">
+    <path d="M 150 820 L 180 830 L 180 850 L 160 860 L 130 850 L 130 830 L 150 820 Z"/>
+  </g>
+</svg>
