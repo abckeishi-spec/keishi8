@@ -257,21 +257,6 @@ if (function_exists('gi_get_cached_stats')) {
         </div>
         <?php endif; ?>
 
-        <!-- シンプル日本地図セクション -->
-        <?php 
-        // シンプルな日本地図グリッドレイアウト
-        $simple_map_path = get_template_directory() . '/template-parts/front-page/japan-map-simple.php';
-        if (file_exists($simple_map_path)) {
-            include $simple_map_path;
-        } else {
-            // フォールバック: 高度な地図
-            $advanced_map_path = get_template_directory() . '/template-parts/front-page/japan-map-advanced.php';
-            if (file_exists($advanced_map_path)) {
-                include $advanced_map_path;
-            }
-        }
-        ?>
-        
         <!-- 地域別検索 -->
         <div class="region-section" data-aos="fade-up">
             <div class="region-header">
@@ -283,8 +268,8 @@ if (function_exists('gi_get_cached_stats')) {
 
             <div class="regions-container">
                 <div class="japan-map-wrapper">
-                    <!-- 完全な47都道府県インタラクティブマップ (代替表示) -->
-                    <div class="map-header" style="display:none;">
+                    <!-- 完全な47都道府県インタラクティブマップ -->
+                    <div class="map-header">
                         <span class="map-instruction">都道府県を選んでください</span>
                     </div>
                     
